@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LOGIN</title>
+
+</head>
+
+<body>
+ <header></header>
+
+<div class = "mus">
+    <h1>Swacch Bharat </h1>
+    <h2>LOG IN</h2>
+
+ <div><br>
+
+     <form method="post">
+    {% csrf_token %}
+    <div><br>
+
+          <input id="username" type="text" name="username"placeholder="Username" value={{ username }}>
+      </div><br>
+
+      <div><br>
+
+          <input id="password" type="password" name="password" placeholder="Password" value={{ password }}>
+      </div><br>
+
+      <input type="submit" value="Log In">
+
+    </form>
+ </div><br>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+

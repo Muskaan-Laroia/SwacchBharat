@@ -16,10 +16,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.conf.urls import url
-from myapp.views import signup_view
+from myapp.views import signup_view, login_view
 
 
 urlpatterns = [
 
-    url('', signup_view)
+    url('', signup_view),
+    url('login/', login_view),
 ]

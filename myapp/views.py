@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 # Create your views here.
 
 from django.shortcuts import render, redirect
-from forms import SignUpForm
-from models import UserModel
+from forms import SignUpForm, LoginForm
+from models import UserModel, SessionToken
 from django.contrib.auth.hashers import make_password, check_password
 
 import sendgrid
@@ -47,5 +47,33 @@ def signup_view(request):
         form = SignUpForm()
 
     return render(request, 'index.html', {'form': form})
+
+
+def login_view(request):
+    response_data = {}
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = UserModel.objects.filter(username=username).first()
+
+            if user:
+                if check_password(password, user.password):
+                    token = SessionToken(user=user)
+                    token.create_token()
+                    token.save()
+                    response = redirect('feed/')
+                    response.set_cookie(key='session_token', value=token.session_token)
+                    return response
+                else:
+                    response_data['message'] = 'Incorrect Password! Please try again!'
+
+    elif request.method == 'GET':
+        form = LoginForm()
+
+    response_data['form'] = form
+    return render(request, 'login.html', response_data)
+
 
 

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <style>
+.mus{
+    width: 350px;
+    height: 650px;
+    padding: 20px;
+    border: 1px solid blue;
+background-color:rgba(0,200,0,0.4);
+border-radius: 30%;
+margin: 40px 0px 0px 30px;
+
+}
+#name{
+margin:0px 0px 0px 50px;
+font-size:20px;
+font-family: Arial, Helvetica, sans-serif;
+}
+#username{
+margin:0px 0px 0px 50px;
+font-size:20px;
+font-family: Arial, Helvetica, sans-serif;
+}
+#password{
+margin:0px 0px 0px 50px;
+font-size:20px;
+font-family: Arial, Helvetica, sans-serif;
+}
+#email{
+margin:0px 0px 0px 50px;
+font-size:20px;
+font-family: Arial, Helvetica, sans-serif;
+}
+
+
+
+h1 {
+font-size:35px;
+    color:Black;
+    margin:10px 10px 5px 40px;
+   font-family: Arial, Helvetica, sans-serif;
+
+}
+h2 {
+    font-size:30px;
+    color:Black;
+    margin:10px 10px 0px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+h3 {
+font-size:25px;
+    color:Black;
+    margin:10px 10px 0px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+
+
+body{
+background-image: url("http://4.bp.blogspot.com/-V1Wg4jRltaM/Vofei_6zPqI/AAAAAAAAE7g/utJR4WxImGE/s1600/Happy%2BRepublic%2BDay%2B2016%2BQuotes%2BImages%2Band%2BHD%2BWallpapers-4.jpg");
+background-size:cover;
+background-position:centre;
+}
+
+ input {
+      border: 0;
+      padding: 10px;
+      font-size: 15px;
+    }
+input[type="submit"] {
+      background: green;
+      color: white;
+      margin:0px 0px 0px 50px;
+      font-size:20px;
+      font-family: Arial, Helvetica, sans-serif;
+      border-radius:20%;
+    }
+   h4{
+   font-size: 20px;
+   margin:10px 0px 0px 100px;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   a{
+   font-size:20px;
+   margin:10px 0px 0px 140px;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+
+</style>
+
+</head>
+ <body>
+
+ <header></header>
+<div class = "mus">
+    <h1>Swacch Bharat </h1>
+    <h2>SIGN UP</h2>
+
+<h3>Let's keep india clean!</h3>
+ <div><br>
+
+<form method="post">
+{% csrf_token %}
+            <div><br>
+
+                <input id="username" type="text"name="username"placeholder="Username" value={{ username }} >
+            </div><br>
+
+            <div><br>
+
+                <input id="name" type="text"name="name"placeholder="Full name" value={{ name }} >
+            </div><br>
+
+            <div><br>
+
+                <input id="email" type="text"name="email" placeholder="Email" value={{ email }} >
+            </div><br>
+
+            <div><br>
+
+                <input id="password" type="password" name="password" placeholder="Password" value={{ password }}>
+            </div><br>
+                <input type="submit" value="Sign Up">
+        </form>
+
+
+    </div><br>
+
+    <div><h4>Already a user? </h4><a href="login/"> Login</a> </div>
+
+</div>
+</body>
+    </html>

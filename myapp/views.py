@@ -10,6 +10,7 @@ from imgurpython import ImgurClient
 import sendgrid
 from sendgrid.helpers.mail import *
 
+
 #views help in adding functionality to the structure
 # Create your views here.
 

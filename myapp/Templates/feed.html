@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 {% load staticfiles %}
-
+<!-- the structure  and styling of the feed page is created which contains all the posts the user posts in al time -->
 
 <html lang="en">
 <head>
@@ -9,14 +9,14 @@
     <title>Title</title>
 </head>
 <body>
-    <form method="post" action="/post/">
+    <form method="post" action="/post/"> <!-- it makes the post-->
         {% csrf_token %}
         <input type="submit" class="btn-default btn" value="Create Post">
 
     </form>
     <form method="post" action="/login/">
     {%csrf_token%}
-<input type="submit" class="btn-default btn" value="Logout">
+<input type="submit" class="btn-default btn" value="Logout">  <!-- it helps the user to logout and come back to the login page-->
     </form>
 
 
@@ -26,7 +26,7 @@
         <h3> Posted by: {{ post.user.username }} </h3>
         <p>[{{ post.created_on }}]</p>
         <img style="display:inline-block; width:350px; height:300px;"
-             src="{{ post.image_url }}" /><br>
+             src="{{ post.image_url }}" /><br> <!--it helps user to post stuff on his insta clone -->
         <span  style="display:inline-block;">{{ post.caption }}</span><br/><br/>
         <div style="display:inline-block">
             {{ post.like_count }} likes this
@@ -54,7 +54,7 @@
         </div>
 
         <div>
-            {% for comment in post.comments %}
+            {% for comment in post.comments %}<!-- it is for the users to post a comment on other posts and on its own -->
                 <p><b>{{ comment.user.username }} [{{ comment.created_on }}]:</b> {{ comment.comment_text }}</p>
             {% endfor %}
         </div>

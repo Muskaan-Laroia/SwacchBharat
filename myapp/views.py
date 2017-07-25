@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from datetime import timedelta
 from django.utils import timezone
 from SwacchBharat.settings import BASE_DIR
-#from clarifai.rest import ClarifaiApp
+from clarifai.rest import ClarifaiApp
 
 
 import json
@@ -14,7 +14,7 @@ from imgurpython import ImgurClient
 import sendgrid
 from sendgrid.helpers.mail import *
 
-
+#views help in adding functionality to the structure
 
 
 
@@ -24,7 +24,7 @@ your_clientId="31bd2c0d7d5a46d"
 your_clientSecret="bd8022508c9d2924f77a230a120e3c8f6d919344"
 sendgrid_key="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"
 api_key_clarifai="b6cb8952189e4e608c72c82668c129b3"
-
+#create the sign up page
 def signup_view(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
@@ -36,7 +36,7 @@ def signup_view(request):
                 name = form.cleaned_data['name']
                 email = form.cleaned_data['email']
                 password = form.cleaned_data['password']
-            # saving data to DB
+                # saving data to DB
                 user = UserModel(name=name, password=make_password(password), email=email, username=username)
                 user.save()
                 sg = sendgrid.SendGridAPIClient(apikey=(sendgrid_key))
@@ -50,13 +50,13 @@ def signup_view(request):
                 print(response.body)
                 print(response.headers)
                 return render(request, 'success.html')
-            # return redirect('login/')
+                # return redirect('login/')
     else:
         form = SignUpForm()
 
     return render(request, 'index.html', {'form': form})
 
-
+#vcreates the login page functionalities
 def login_view(request):
     response_data = {}
     if request.method == "POST":
@@ -82,7 +82,7 @@ def login_view(request):
 
     response_data['form'] = form
     return render(request, 'login.html', response_data)
-
+#creates the  post fiunctionality helping the user to post things
 
 def post_view(request):
     user = check_validation(request)
@@ -100,17 +100,17 @@ def post_view(request):
 
                 client = ImgurClient(your_clientId, your_clientSecret)
                 post.image_url = client.upload_from_path(path, anon=True)['link']
-                #app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
+                app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
 
-              #  app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
-               # model = app.models.get("general-v1.3")
-                #response=model.predict_by_url(url=post.image_url)
+                app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
+                model = app.models.get("general-v1.3")
+                response=model.predict_by_url(url=post.image_url)
 
-                #file_name = 'output' + '.json'
+                file_name = 'output' + '.json'
 
-                #for json_dict in response:
-                    #for key, value in response.iteritems():
-                        #print("key: {} | value: {}".format(key, value))
+                for json_dict in response:
+                    for key, value in response.iteritems():
+                        print("key: {} | value: {}".format(key, value))
 
 
 
@@ -126,31 +126,31 @@ def post_view(request):
     else:
         return redirect('/login/')
 
+#this code is for clarifai and categorizing the posts under various attributes
+def add_category(post):
+    app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
+    model = app.models.get("general-v1.3")
+    response = model.predict_by_url(url=post.image_url)
+    if response["status"]["code"]==10000:
+        if response["outputs"]:
+            if response["output"][0]["data"]:
+                if response["output"][0]["data"]["concepts"]:
+                    for index in range (0,len(response)["outputs"][0]["data"]["concepts"]):
+                        category=Category.Models(post=post,category_text=response['outputs'][0]['data']['concepts'][index]['name'])
+                        print response
+                        category.save()
+                else:
+                    print 'no concepts error'
+            else:
+                print 'no data list error'
+        else:
+            print 'no outtput list error'
+    else:
+        print 'response code error'
 
-# def add_category(post):
-#     app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
-#     model = app.models.get("general-v1.3")
-#     response = model.predict_by_url(url=post.image_url)
-#     if response["status"]["code"]==10000:
-#         if response["outputs"]:
-#              if response["output"][0]["data"]:
-#                  if response["output"][0]["data"]["concepts"]:
-#                      for index in range (0,len(response)["outputs"][0]["data"]["concepts"]):
-#                          category=Category.Models(post=post,category_text=response['outputs'][0]['data']['concepts'][index]['name'])
-#                          print response
-#                          category.save()
-#                  else:
-#                      print 'no concepts error'
-#              else:
-#                  print 'no data list error'
-#          else:
-#              print 'no outtput list error'
-#      else:
-#           print 'response code error'
 
 
-
-def feed_view(request):
+def feed_view(request): #creates the feed page functionalities
     user = check_validation(request)
     if user:
 
@@ -167,7 +167,7 @@ def feed_view(request):
         return redirect('/login/')
 
 
-def like_view(request):
+def like_view(request):# create the like funcionalities
     user = check_validation(request)
     if user and request.method == 'POST':
         form = LikeForm(request.POST)
@@ -197,7 +197,7 @@ def like_view(request):
     else:
         return redirect('/login/')
 
-
+#helps to post a comment on the post as it adds the commenting functionality
 def comment_view(request):
     user = check_validation(request)
     if user and request.method == 'POST':
@@ -235,7 +235,7 @@ def check_validation(request):
                 return session.user
     else:
         return None
-
+#helps the user to logout as it addsthe logging out funtionality taking the user to the login page
 def logout_view(request):
     request.session.modified= True
     response=redirect('/login/')

@@ -1,62 +1,61 @@
 from django.shortcuts import render, redirect
 from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm
-from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel
+from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel ,CategoryModel
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import timedelta
 from django.utils import timezone
 from SwacchBharat.settings import BASE_DIR
 from clarifai.rest import ClarifaiApp
-
-
-import json
-import codecs
 from imgurpython import ImgurClient
 import sendgrid
 from sendgrid.helpers.mail import *
 
 #views help in adding functionality to the structure
-
-
-
 # Create your views here.
 
 your_clientId="31bd2c0d7d5a46d"
 your_clientSecret="bd8022508c9d2924f77a230a120e3c8f6d919344"
 sendgrid_key="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"
 api_key_clarifai="b6cb8952189e4e608c72c82668c129b3"
+
 #create the sign up page
+
 def signup_view(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
+
         if form.is_valid():
-            if(len(form.cleaned_data['username'])<5):
+            if(len(form.cleaned_data['username'])<5 or set('[~!#$%^&*()_+{}":;\']+$ " "').intersection(form.cleaned_data['username'])):
                 return render(request,'invalid.html')
             else:
-                username = form.cleaned_data['username']
-                name = form.cleaned_data['name']
-                email = form.cleaned_data['email']
-                password = form.cleaned_data['password']
-                # saving data to DB
-                user = UserModel(name=name, password=make_password(password), email=email, username=username)
-                user.save()
-                sg = sendgrid.SendGridAPIClient(apikey=(sendgrid_key))
-                from_email = Email("muskaanlaroia@gmail.com")
-                to_email = Email(form.cleaned_data['email'])
-                subject = "Welcome to SwacchBharat"
-                content = Content("text/plain", "Swacch Bharat team welcomes you!\n We hope you like sharing the images of your surroundings to help us build a cleaner india /n")
-                mail = Mail(from_email, subject, to_email, content)
-                response = sg.client.mail.send.post(request_body=mail.get())
-                print(response.status_code)
-                print(response.body)
-                print(response.headers)
-                return render(request, 'success.html')
-                # return redirect('login/')
+                if (len(form.cleaned_data["password"])>5):
+                    username = form.cleaned_data['username']
+                    name = form.cleaned_data['name']
+                    email = form.cleaned_data['email']
+                    password = form.cleaned_data['password']
+                    # saving data to the database
+                    user = UserModel(name=name, password=make_password(password), email=email, username=username)
+                    user.save()
+                    sg = sendgrid.SendGridAPIClient(apikey=(sendgrid_key))
+                    from_email = Email("muskaanlaroia@gmail.com")
+                    to_email = Email(form.cleaned_data['email'])
+                    subject = "Welcome to SwacchBharat"
+                    content = Content("text/plain", "Swacch Bharat team welcomes you!\n We hope you like sharing the images of your surroundings to help us build a cleaner india /n")
+                    mail = Mail(from_email, subject, to_email, content)
+                    response = sg.client.mail.send.post(request_body=mail.get())
+                    print(response.status_code)
+                    print(response.body)
+                    print(response.headers)
+                    return render(request, 'success.html')
+                else:
+                    return render(request, 'invalid.html')
+                    # return redirect('login/')
     else:
         form = SignUpForm()
 
-    return render(request, 'index.html', {'form': form})
+    return render(request, 'index.html' , {'form': form})
 
-#vcreates the login page functionalities
+#it creates the login page functionalities
 def login_view(request):
     response_data = {}
     if request.method == "POST":
@@ -75,7 +74,7 @@ def login_view(request):
                     response.set_cookie(key='session_token', value=token.session_token)
                     return response
                 else:
-                    response_data['message'] = 'Incorrect Password! Please try again!'
+                    return render(request, 'invalidlogin.html')
 
     elif request.method == 'GET':
         form = LoginForm()
@@ -100,21 +99,6 @@ def post_view(request):
 
                 client = ImgurClient(your_clientId, your_clientSecret)
                 post.image_url = client.upload_from_path(path, anon=True)['link']
-                app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
-
-                app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
-                model = app.models.get("general-v1.3")
-                response=model.predict_by_url(url=post.image_url)
-
-                file_name = 'output' + '.json'
-
-                for json_dict in response:
-                    for key, value in response.iteritems():
-                        print("key: {} | value: {}".format(key, value))
-
-
-
-
 
                 post.save()
 
@@ -130,15 +114,17 @@ def post_view(request):
 def add_category(post):
     app = ClarifaiApp(api_key='c0d6dcc72a5f490b8a1f0df33bf2f272')
     model = app.models.get("general-v1.3")
+
     response = model.predict_by_url(url=post.image_url)
     if response["status"]["code"]==10000:
         if response["outputs"]:
             if response["output"][0]["data"]:
                 if response["output"][0]["data"]["concepts"]:
-                    for index in range (0,len(response)["outputs"][0]["data"]["concepts"]):
-                        category=Category.Models(post=post,category_text=response['outputs'][0]['data']['concepts'][index]['name'])
-                        print response
+                    x=[]
+                    for index in range (0,len(response["outputs"][0]["data"]["concepts"])):
+                        category=x.append(CategoryModel(post=post,category_text=response['outputs'][0]['data']['concepts'][index]['name']))
                         category.save()
+                        print x
                 else:
                     print 'no concepts error'
             else:
@@ -147,7 +133,6 @@ def add_category(post):
             print 'no outtput list error'
     else:
         print 'response code error'
-
 
 
 def feed_view(request): #creates the feed page functionalities

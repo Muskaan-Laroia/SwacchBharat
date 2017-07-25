@@ -1,23 +1,24 @@
 
 <!DOCTYPE html>
-{% load staticfiles %}
-<!-- the structure  and styling of the feed page is created which contains all the posts the user posts in al time -->
 
+<!-- the structure  and styling of the feed page is created which contains all the posts the user posts in al time -->
+{% load staticfiles %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>YourFeed</title>
 </head>
 <body>
-    <form method="post" action="/post/"> <!-- it makes the post-->
+    <form method="post" action="/post/">
         {% csrf_token %}
-        <input type="submit" class="btn-default btn" value="Create Post">
 
+        <input type="submit" class="btn-default btn" value="Create Post">
     </form>
-    <form method="post" action="/login/">
-    {%csrf_token%}
-<input type="submit" class="btn-default btn" value="Logout">  <!-- it helps the user to logout and come back to the login page-->
-    </form>
+      <form method="post" action="/login/">
+          {%csrf_token%}
+      <input type="submit" class="btn-default btn" value="Logout">
+          </form>
+
 
 
     {% for post in posts %}
@@ -26,7 +27,7 @@
         <h3> Posted by: {{ post.user.username }} </h3>
         <p>[{{ post.created_on }}]</p>
         <img style="display:inline-block; width:350px; height:300px;"
-             src="{{ post.image_url }}" /><br> <!--it helps user to post stuff on his insta clone -->
+             src="{{ post.image_url }}" /><br>
         <span  style="display:inline-block;">{{ post.caption }}</span><br/><br/>
         <div style="display:inline-block">
             {{ post.like_count }} likes this
@@ -43,18 +44,33 @@
             </form>
         </div>
 
+
+        <div >
+                 <p>
+                Categories
+            </p>
+                 <p>
+                         {% for category in post.category %}
+            <span>{{category.category_text}}</span>
+            {% endfor %}
+                 </p>
+
+        </div>
+
         <div>
             <form method="POST" action="/comment/">
                 {% csrf_token %}
+                {{form.as_p}}
                 <input type="hidden" name="post" value="{{ post.id }}" />
                 <input type="text" name="comment_text" id="comment_text" placeholder="Make a comment.." value="{{ comment_text }}">
                 {{ comment_text }}
                 <input type="submit" class="btn-default btn" value="Comment">
+
             </form>
         </div>
 
         <div>
-            {% for comment in post.comments %}<!-- it is for the users to post a comment on other posts and on its own -->
+            {% for comment in post.comments %}
                 <p><b>{{ comment.user.username }} [{{ comment.created_on }}]:</b> {{ comment.comment_text }}</p>
             {% endfor %}
         </div>

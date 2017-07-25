@@ -6,7 +6,7 @@ from django.db import models
 
 import uuid
 
-# Create your models here.
+#Create your models here.
 
 #this model is for the sign up page and also used the same model in login page
 class UserModel(models.Model):
@@ -63,4 +63,14 @@ class CommentModel(models.Model):
 	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(auto_now=True)
 
+#this further model is for creagting a database for various categories in which the posts may lie , such as clean or dirty
+class CategoryModel(models.Model):
+   user = models.ForeignKey(UserModel)
+   post = models.ForeignKey(PostModel)
+   category_text = models.CharField(max_length=255)
+
+
+   @property
+   def category(self):
+      return CategoryModel.objects.filter(post=self)
 
